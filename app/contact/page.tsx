@@ -17,7 +17,7 @@ export default function ContactPage() {
             Request a quote
           </h1>
           <p className="text-lg text-text/70 max-w-2xl mx-auto">
-            Whether you're planning an event or interested in joining our roster, we'd love to hear from you. Share your details and we'll be in touch soon.
+            Whether you&apos;re planning an event or interested in joining our roster, we&apos;d love to hear from you. Share your details and we&apos;ll be in touch soon.
           </p>
         </motion.div>
 

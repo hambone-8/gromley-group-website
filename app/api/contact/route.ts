@@ -7,7 +7,10 @@ import {
   getMusicianAutoResponder,
 } from "@/lib/utils";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Initialize Resend only if API key is available
+const resend = process.env.RESEND_API_KEY 
+  ? new Resend(process.env.RESEND_API_KEY)
+  : null;
 
 export async function POST(req: NextRequest) {
   try {
@@ -38,7 +41,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Check if Resend is configured
-    if (!process.env.RESEND_API_KEY) {
+    if (!resend || !process.env.RESEND_API_KEY) {
       console.error("RESEND_API_KEY is not configured");
       return NextResponse.json(
         { error: "Email service is not configured. Please contact us directly." },

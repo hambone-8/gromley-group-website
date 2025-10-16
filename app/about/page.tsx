@@ -63,14 +63,14 @@ export default function AboutPage() {
                     Founded in Scottsdale, The Gromley Group blends years of hospitality leadership—including management at the famed <strong className="text-text">Handlebar J</strong>—with a deep network of professional musicians.
                   </p>
                   <p>
-                    Before hospitality, the founder served as a teacher and middle-school department chair: organizing lively crowds, setting the tone, and keeping things running smoothly. That same calm, confident coordination ensures your event's music arrives on time, sounds right, and elevates the experience.
+                    Before hospitality, the founder served as a teacher and middle-school department chair: organizing lively crowds, setting the tone, and keeping things running smoothly. That same calm, confident coordination ensures your event&apos;s music arrives on time, sounds right, and elevates the experience.
                   </p>
                   <p>
-                    Today, The Gromley Group brings that unique combination of educational leadership, hospitality expertise, and music industry relationships to every booking. We understand how to read a room, match energy to the moment, and deliver performances that feel effortless—because we've handled all the details behind the scenes.
+                    Today, The Gromley Group brings that unique combination of educational leadership, hospitality expertise, and music industry relationships to every booking. We understand how to read a room, match energy to the moment, and deliver performances that feel effortless—because we&apos;ve handled all the details behind the scenes.
                   </p>
                   <div className="pt-6 border-t border-muted mt-8">
                     <p className="italic text-text/70">
-                      "Whether it's a quiet jazz trio for an intimate dinner or a full band for a wedding celebration, we curate talent that fits your vision and manages every logistical detail so you can focus on your guests."
+                      &ldquo;Whether it&apos;s a quiet jazz trio for an intimate dinner or a full band for a wedding celebration, we curate talent that fits your vision and manages every logistical detail so you can focus on your guests.&rdquo;
                     </p>
                   </div>
                 </div>
@@ -184,7 +184,7 @@ export default function AboutPage() {
                 Ready to elevate your event?
               </h2>
               <p className="text-lg text-text/70 mb-8">
-                Let's discuss your vision and find the perfect musical fit
+                Let&apos;s discuss your vision and find the perfect musical fit
               </p>
               <Button size="lg" asChild>
                 <Link href="/contact">Request a Quote</Link>

@@ -37,7 +37,7 @@ export function RosterTeaser() {
             From acoustic duos to dance bands
           </h2>
           <p className="text-text/70 text-lg max-w-2xl mx-auto">
-            Our curated roster spans every genre and ensemble size, matched to your venue's energy and your event's vision
+            Our curated roster spans every genre and ensemble size, matched to your venue&apos;s energy and your event&apos;s vision
           </p>
         </motion.div>
 
