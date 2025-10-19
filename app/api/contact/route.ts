@@ -12,10 +12,53 @@ const resend = process.env.RESEND_API_KEY
   ? new Resend(process.env.RESEND_API_KEY)
   : null;
 
+// In-memory rate limiting (resets on server restart)
+const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
+const RATE_LIMIT_MAX = 3; // Max submissions per IP
+const RATE_LIMIT_WINDOW = 60 * 60 * 1000; // 1 hour in milliseconds
+
+// Clean up old entries periodically
+setInterval(() => {
+  const now = Date.now();
+  for (const [ip, data] of rateLimitMap.entries()) {
+    if (now > data.resetTime) {
+      rateLimitMap.delete(ip);
+    }
+  }
+}, 60 * 60 * 1000); // Clean up every hour
+
+function checkRateLimit(ip: string): boolean {
+  const now = Date.now();
+  const record = rateLimitMap.get(ip);
+
+  if (!record || now > record.resetTime) {
+    // Create new record
+    rateLimitMap.set(ip, { count: 1, resetTime: now + RATE_LIMIT_WINDOW });
+    return true;
+  }
+
+  if (record.count >= RATE_LIMIT_MAX) {
+    return false; // Rate limit exceeded
+  }
+
+  // Increment count
+  record.count++;
+  return true;
+}
+
 export async function POST(req: NextRequest) {
   try {
+    // Rate limiting
+    const ip = req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || "unknown";
+    if (!checkRateLimit(ip)) {
+      return NextResponse.json(
+        { error: "Too many submissions. Please try again later." },
+        { status: 429 }
+      );
+    }
+
     const body = await req.json();
-    const { inquiryType, message, honeypot } = body;
+    const { inquiryType, name, email, phone, message, honeypot } = body;
 
     // Honeypot check - if filled, silently reject (likely a bot)
     if (honeypot) {
@@ -26,6 +69,30 @@ export async function POST(req: NextRequest) {
     }
 
     // Validation
+    if (!name || name.trim().length < 2) {
+      return NextResponse.json(
+        { error: "Please provide your name" },
+        { status: 400 }
+      );
+    }
+
+    // Validate email with proper regex
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email || !emailRegex.test(email.trim())) {
+      return NextResponse.json(
+        { error: "Please provide a valid email address" },
+        { status: 400 }
+      );
+    }
+
+    // Optional phone validation - if provided, should have reasonable length
+    if (phone && phone.trim().length > 0 && phone.trim().length < 7) {
+      return NextResponse.json(
+        { error: "Please provide a valid phone number" },
+        { status: 400 }
+      );
+    }
+
     if (!message || message.trim().length < 10) {
       return NextResponse.json(
         { error: "Please provide a detailed message (at least 10 characters)" },
@@ -49,7 +116,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const toEmail = process.env.CONTACT_TO_EMAIL || "info@thegromleygroup.com";
+    const toEmail = process.env.CONTACT_TO_EMAIL || "info@gromleygroup.com";
 
     // Determine subject line based on inquiry type
     const subject =
@@ -57,34 +124,45 @@ export async function POST(req: NextRequest) {
         ? "New Client Inquiry - Gromley Group"
         : "New Musician Inquiry - Gromley Group";
 
-    // Get appropriate email template
+    // Get appropriate email template with contact info
     const emailTemplate =
       inquiryType === "client"
-        ? getClientEmailTemplate(message)
-        : getMusicianEmailTemplate(message);
+        ? getClientEmailTemplate(name, email, phone, message)
+        : getMusicianEmailTemplate(name, email, phone, message);
 
     // Get appropriate auto-responder
     const autoResponderTemplate =
       inquiryType === "client"
-        ? getClientAutoResponder()
-        : getMusicianAutoResponder();
+        ? getClientAutoResponder(name)
+        : getMusicianAutoResponder(name);
 
     // Send email to business
     const businessEmail = await resend.emails.send({
-      from: "The Gromley Group <noreply@thegromleygroup.com>",
+      from: "The Gromley Group <noreply@gromleygroup.com>",
       to: toEmail,
       subject: subject,
       html: emailTemplate,
     });
 
     if (!businessEmail.data) {
-      throw new Error("Failed to send business notification email");
+      console.error("Resend API error:", businessEmail.error);
+      throw new Error(`Failed to send business notification email: ${businessEmail.error?.message || 'Unknown error'}`);
     }
 
-    // Send auto-responder to user (extract email from message if present, otherwise skip)
-    // Note: For a production system, you'd want to add an email field to the form
-    // For now, we'll just log this as a success without sending auto-responder
-    // You can enhance this later by adding an email field to the ContactForm
+    // Send auto-responder to user
+    try {
+      await resend.emails.send({
+        from: "Maya at Gromley Group <info@gromleygroup.com>",
+        to: email,
+        subject: inquiryType === "client" 
+          ? "Thanks for reaching out!"
+          : "Thanks for your interest!",
+        html: autoResponderTemplate,
+      });
+    } catch (autoResponderError) {
+      // Log error but don't fail the whole request
+      console.error("Failed to send auto-responder:", autoResponderError);
+    }
 
     return NextResponse.json({
       success: true,

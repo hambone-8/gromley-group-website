@@ -6,12 +6,18 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 // Email template for client inquiries
-export function getClientEmailTemplate(message: string) {
+export function getClientEmailTemplate(name: string, email: string, phone: string, message: string) {
   return `
     <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
       <h2 style="color: #1A1A1A;">New Client Inquiry</h2>
+      <div style="background: #F9F9F9; padding: 15px; border-radius: 8px; margin: 20px 0;">
+        <p style="margin: 0 0 10px 0; color: #333;"><strong>Name:</strong> ${name}</p>
+        <p style="margin: 0 0 10px 0; color: #333;"><strong>Email:</strong> <a href="mailto:${email}" style="color: #C8A882;">${email}</a></p>
+        ${phone ? `<p style="margin: 0 0 10px 0; color: #333;"><strong>Phone:</strong> ${phone}</p>` : ''}
+      </div>
       <div style="background: #F4E9DC; padding: 20px; border-radius: 8px; margin: 20px 0;">
-        <p style="margin: 0; white-space: pre-wrap;">${message}</p>
+        <p style="margin: 0 0 8px 0; font-weight: bold; color: #1A1A1A;">Message:</p>
+        <p style="margin: 0; white-space: pre-wrap; color: #333;">${message}</p>
       </div>
       <p style="color: #666; font-size: 14px;">This inquiry was submitted via the Gromley Group website contact form.</p>
     </div>
@@ -19,12 +25,18 @@ export function getClientEmailTemplate(message: string) {
 }
 
 // Email template for musician inquiries
-export function getMusicianEmailTemplate(message: string) {
+export function getMusicianEmailTemplate(name: string, email: string, phone: string, message: string) {
   return `
     <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
       <h2 style="color: #1A1A1A;">New Musician Inquiry</h2>
+      <div style="background: #F9F9F9; padding: 15px; border-radius: 8px; margin: 20px 0;">
+        <p style="margin: 0 0 10px 0; color: #333;"><strong>Name:</strong> ${name}</p>
+        <p style="margin: 0 0 10px 0; color: #333;"><strong>Email:</strong> <a href="mailto:${email}" style="color: #C8A882;">${email}</a></p>
+        ${phone ? `<p style="margin: 0 0 10px 0; color: #333;"><strong>Phone:</strong> ${phone}</p>` : ''}
+      </div>
       <div style="background: #F4E9DC; padding: 20px; border-radius: 8px; margin: 20px 0;">
-        <p style="margin: 0; white-space: pre-wrap;">${message}</p>
+        <p style="margin: 0 0 8px 0; font-weight: bold; color: #1A1A1A;">Message:</p>
+        <p style="margin: 0; white-space: pre-wrap; color: #333;">${message}</p>
       </div>
       <p style="color: #666; font-size: 14px;">This inquiry was submitted via the Gromley Group website contact form.</p>
     </div>
@@ -32,47 +44,31 @@ export function getMusicianEmailTemplate(message: string) {
 }
 
 // Auto-responder for clients
-export function getClientAutoResponder() {
+export function getClientAutoResponder(name: string) {
+  const firstName = name.split(' ')[0];
   return `
-    <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
-      <h2 style="color: #1A1A1A;">Thank you for reaching out!</h2>
-      <p>We've received your inquiry about booking music for your event.</p>
-      <p>We'll review your request and get back to you within 24-48 hours with next steps, including:</p>
-      <ul>
-        <li>Curated musician recommendations for your event</li>
-        <li>Availability confirmation</li>
-        <li>Transparent pricing</li>
-        <li>Any questions we might have about your vision</li>
-      </ul>
-      <p>In the meantime, feel free to reply to this email with any additional details about your event.</p>
-      <p style="margin-top: 30px;">
-        Warm regards,<br/>
-        <strong>The Gromley Group</strong><br/>
-        <span style="color: #666;">Phoenix • Scottsdale • Nationwide on request</span>
-      </p>
+    <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; line-height: 1.6;">
+      <p>Hi ${firstName},</p>
+      <p>Thanks for reaching out! I'll review your details and get back to you within 24-48 hours with availability, pricing and recommendations.</p>
+      <p>Feel free to reply to this email anytime if you think of anything else you'd like to share.</p>
+      <p style="margin-top: 30px; margin-bottom: 5px;">Best,</p>
+      <p style="margin: 0;"><strong>Maya Wriston</strong><br/>
+      <span style="color: #666; font-size: 14px;">Gromley Group</span></p>
     </div>
   `;
 }
 
 // Auto-responder for musicians
-export function getMusicianAutoResponder() {
+export function getMusicianAutoResponder(name: string) {
+  const firstName = name.split(' ')[0];
   return `
-    <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
-      <h2 style="color: #1A1A1A;">Thank you for your interest!</h2>
-      <p>We've received your inquiry about joining the Gromley Group roster.</p>
-      <p>We carefully review all musician applications and will be in touch within one week. We'll be looking at:</p>
-      <ul>
-        <li>Your performance experience and style</li>
-        <li>Professionalism and reliability</li>
-        <li>Fit with our client needs and venue relationships</li>
-        <li>Any media or links you've shared</li>
-      </ul>
-      <p>Thank you for considering working with us. We appreciate professional musicians who value excellent communication and reliable delivery.</p>
-      <p style="margin-top: 30px;">
-        Best regards,<br/>
-        <strong>The Gromley Group</strong><br/>
-        <span style="color: #666;">Phoenix • Scottsdale • Nationwide on request</span>
-      </p>
+    <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; line-height: 1.6;">
+      <p>Hi ${firstName},</p>
+      <p>Thanks for reaching out! I'll review your information and get back to you within one week.</p>
+      <p>If you have any additional materials you'd like to share (EPK, recordings, etc.), feel free to reply to this email.</p>
+      <p style="margin-top: 30px; margin-bottom: 5px;">Best,</p>
+      <p style="margin: 0;"><strong>Maya Wriston</strong><br/>
+      <span style="color: #666; font-size: 14px;">Gromley Group</span></p>
     </div>
   `;
 }
